@@ -15,6 +15,8 @@ Privacy First: Alle data wordt lokaal opgeslagen in jouw eigen browser (Local St
 
 AI Export: Genereer met één klik een geanonimiseerd rapport dat geoptimaliseerd is om te delen met AI-tools (zoals ChatGPT) voor loopbaanadvies.
 
+AI Loopbaancoach: Stuur direct een prompt naar ChatGPT om loopbaanadvies te krijgen.
+
 
 🚀 Hoe te gebruiken
 
