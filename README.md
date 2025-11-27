@@ -13,6 +13,7 @@ AI Export: Genereer met één klik een geanonimiseerd rapport dat geoptimaliseer
 🚀 Hoe te gebruiken
 
 Online (via GitHub Pages) $$Hier komt de link naar je GitHub pages site, bijv: https://www.google.com/search?q=[https://jouwnaam.github.io/waarden-kompas](https://roelandvugts.github.io/Waarden-Kompas/)$$
+
 Lokaal - Download het bestand Waarde_kompas.html.
 Dubbelklik op het bestand om het te openen in je favoriete browser (Chrome, Safari, Edge, etc.).
 Begin direct met invullen!
