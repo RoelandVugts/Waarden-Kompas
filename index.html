@@ -29,7 +29,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- ICONEN (Inline SVG's ter vervanging van lucide-react voor standalone HTML) ---
+        // --- ICONEN ---
         const Icon = ({ path, className, color = "currentColor", size = 24, ...props }) => (
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -48,7 +48,6 @@
             </svg>
         );
 
-        // OPGELOST: Alle iconen met meerdere elementen zijn nu gewikkeld in fragments (<>...</>)
         const icons = {
             RefreshCw: <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8m0 0v5m0-5h-5m0 13a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16m0 0v-5m0 5h5" />,
             History: <><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 8h5v5" /><path d="M12 7v5l4 2" /></>,
@@ -64,7 +63,9 @@
             Upload: <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></>,
             X: <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>,
             RotateCcw: <><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></>,
-            Trash2: <><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></>
+            Trash2: <><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></>,
+            Sparkles: <><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M9 5H5" /><path d="M19 16v4" /><path d="M15 18h4" /></>,
+            ExternalLink: <><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></>
         };
 
         const LucideIcon = ({ name, ...props }) => {
@@ -395,12 +396,67 @@
                 textArea.select();
                 try {
                     document.execCommand('copy');
-                    setNotification('Rapport (inclusief trends) gekopieerd!');
+                    setNotification('Rapport gekopieerd!');
                 } catch (err) {
                     setNotification('Kopiëren mislukt.');
                 }
                 document.body.removeChild(textArea);
                 setTimeout(() => setNotification(''), 3000);
+            };
+
+            const handleAICoach = () => {
+                const timestamp = new Date().toLocaleDateString('nl-NL');
+                
+                // Stap 1: Bouw de prompt
+                let prompt = `Je bent een ervaren loopbaancoach en psycholoog. Ik heb een 'Waarden Kompas' oefening gedaan. Hieronder vind je mijn resultaten in JSON-formaat.
+
+**Mijn Data bevat:**
+1. **Crisis (Alarmfase):** Waarden die ik cruciaal vind (Must) maar die ontbreken of onvoldoende zijn.
+2. **Optimization (Verbeterpunten):** Belangrijke waarden die slechts matig aanwezig zijn.
+3. **Success:** Waarden die goed zitten.
+4. **Trends:** Veranderingen t.o.v. mijn vorige sessie.
+
+**Jouw Opdracht:**
+1. Schrijf een korte, empathische samenvatting van mijn huidige werkgeluk.
+2. Geef 3 concrete, actiegerichte adviezen om mijn 'Crisis' punten aan te pakken.
+3. Analyseer de trends: wat zegt de verschuiving in mijn waarden over mijn persoonlijke ontwikkeling?
+4. Geef een suggestie voor een type rol of werkomgeving die goed bij dit profiel zou passen.
+
+**Hier is de data:**
+\`\`\`json
+${JSON.stringify({
+    crisis: analysis.crisis.map(i => ({waarde: i.category, aanwezigheid: i.presence})),
+    optimalisatie: analysis.optimization.map(i => ({waarde: i.category, aanwezigheid: i.presence})),
+    successen: analysis.success.map(i => ({waarde: i.category})),
+    trends: analysis.changedItems.map(i => ({
+        waarde: i.category, 
+        belang_was: i.prevImp, 
+        belang_nu: i.importance,
+        aanwezigheid_was: i.prevPres,
+        aanwezigheid_nu: i.presence
+    }))
+}, null, 2)}
+\`\`\``;
+
+                // Stap 2: Kopieer naar klembord
+                const textArea = document.createElement("textarea");
+                textArea.value = prompt;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    setNotification('Prompt gekopieerd! Plak dit in ChatGPT.');
+                } catch (err) {
+                    setNotification('Kopiëren mislukt.');
+                }
+                document.body.removeChild(textArea);
+
+                // Stap 3: Open ChatGPT
+                setTimeout(() => {
+                    window.open('https://chatgpt.com/', '_blank');
+                }, 1000);
+                
+                setTimeout(() => setNotification(''), 4000);
             };
 
             const progressPercentage = Math.round((analysis.filled.length / INITIAL_VALUES.length) * 100);
@@ -492,9 +548,14 @@
                                         <p className="text-slate-500 text-sm mt-1">Gebaseerd op {analysis.filled.length} ingevulde waarden.</p>
                                         {baselineSession && <p className="text-xs text-indigo-600 mt-1 font-medium">Vergeleken met sessie van: {baselineSession.date}</p>}
                                     </div>
-                                    <button onClick={exportForAI} className="flex items-center gap-2 bg-slate-800 text-white px-5 py-2.5 rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium shadow-sm">
-                                        <LucideIcon name="Copy" size={16} /> Kopieer Rapport voor AI
-                                    </button>
+                                    <div className="flex flex-col sm:flex-row gap-2">
+                                        <button onClick={handleAICoach} className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all text-sm font-bold shadow-md">
+                                            <LucideIcon name="Sparkles" size={16} /> Start AI Loopbaan Coach <LucideIcon name="ExternalLink" size={14} className="opacity-70" />
+                                        </button>
+                                        <button onClick={exportForAI} className="flex items-center gap-2 bg-slate-100 text-slate-700 border border-slate-200 px-4 py-2.5 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium">
+                                            <LucideIcon name="Copy" size={16} /> Kopieer Data
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {analysis.filled.length === 0 ? (
